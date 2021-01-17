@@ -25,4 +25,26 @@ router.get("/:id", [param("id").isMongoId()], (req, res, next) => {
   })
 })
 
+router.post(
+  "/",
+  [body("name", "Name must consist of letters only").isAlpha()],
+  (req, res, next) => {
+    const errors = validationResult(req).formatWith(errorFormatter)
+    if (!errors.isEmpty())
+      return res.status(442).json({ errors: errors.mapped() })
+
+    const { name } = req.body
+    Tag.findOne({ name }, (err, data) => {
+      if (err) return next(err)
+      if (data) return res.status(422).json({ message: "Tag already exists" })
+      else {
+        Tag.create({ name }, (err, data) => {
+          if (err) return next(err)
+          return res.status(201).json({ data })
+        })
+      }
+    })
+  }
+)
+
 module.exports = router
