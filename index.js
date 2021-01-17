@@ -9,6 +9,7 @@ const routes = require("./routes")
 const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy
 const User = require("./models/user.model")
+const cookieParser = require("cookie-parser")
 
 // Connect to the database
 mongoose.connect(config.db.uri, {
@@ -28,6 +29,12 @@ db.once("open", () => {
 
 app.use("/media", express.static(path.join(__dirname, "media")))
 app.use(bodyParser.json())
+app.use(
+  cookieParser(config.cookies.secret, {
+    httpOnly: true,
+    maxAge: config.cookies.maxAge,
+  })
+)
 app.use(passport.initialize())
 passport.use(new LocalStrategy({ usernameField: "email" }, User.authenticate()))
 passport.serializeUser(User.serializeUser())
