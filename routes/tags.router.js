@@ -47,4 +47,37 @@ router.post(
   }
 )
 
+router.put(
+  "/:id",
+  [
+    param("id").isMongoId(),
+    body("name", "Name must consist of letters only").isAlpha(),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req).formatWith(errorFormatter)
+    const errorsMapped = errors.mapped()
+    if (errorsMapped.id)
+      return res.status(404).json({ message: "Invalid tag id" })
+    if (!errors.isEmpty()) return res.status(422).json({ errors: errorsMapped })
+
+    const { name } = req.body
+    Tag.findOne({ name }, (err, data) => {
+      if (err) return next(err)
+      if (data) return res.status(422).json({ message: "Tag already exists" })
+      else {
+        Tag.findByIdAndUpdate(
+          req.params.id,
+          { name },
+          { new: true },
+          (err, data) => {
+            if (err) return next(err)
+            if (!data) return res.status(404).json({ message: "Tag not found" })
+            return res.json({ data })
+          }
+        )
+      }
+    })
+  }
+)
+
 module.exports = router
