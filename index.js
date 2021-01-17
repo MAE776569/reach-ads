@@ -5,12 +5,14 @@ const mongoose = require("mongoose")
 const bodyParser = require("body-parser")
 const path = require("path")
 const config = require("./config/server.config")
+const routes = require("./routes")
 
 // Connect to the database
 mongoose.connect(config.db.uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
+  useCreateIndex: true,
 })
 const db = mongoose.connection
 db.on("error", () => {
@@ -23,6 +25,7 @@ db.once("open", () => {
 
 app.use("/media", express.static(path.join(__dirname, "media")))
 app.use(bodyParser.json())
+app.use(routes)
 
 // Error handler
 app.use((err, req, res, next) => {
