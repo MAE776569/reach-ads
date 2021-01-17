@@ -4,6 +4,7 @@ const errorFormatter = require("../config/errorFormatter")
 const User = require("../models/user.model")
 const { generateAccessToken } = require("../config/jwt.config")
 const passport = require("passport")
+const { authenticateUser } = require("../middlewares/authentication")
 
 router.post(
   "/register",
@@ -88,5 +89,13 @@ router.post(
     })(req, res, next)
   }
 )
+
+router.post("/logout", authenticateUser, (req, res, next) => {
+  res.clearCookie("actk", {
+    signed: true,
+    httpOnly: true,
+  })
+  return res.json({ success: true })
+})
 
 module.exports = router
