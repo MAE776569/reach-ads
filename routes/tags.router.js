@@ -80,4 +80,15 @@ router.put(
   }
 )
 
+router.delete("/:id", [param("id").isMongoId()], (req, res, next) => {
+  const errors = validationResult(req).formatWith(errorFormatter).mapped()
+  if (errors.id) return res.status(404).json({ message: "Invalid tag id" })
+
+  Tag.findByIdAndDelete(req.params.id, (err, data) => {
+    if (err) return next(err)
+    if (!data) return res.status(404).json({ message: "Tag not found" })
+    return res.json({ data })
+  })
+})
+
 module.exports = router
