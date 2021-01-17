@@ -6,6 +6,9 @@ const bodyParser = require("body-parser")
 const path = require("path")
 const config = require("./config/server.config")
 const routes = require("./routes")
+const passport = require("passport")
+const LocalStrategy = require("passport-local").Strategy
+const User = require("./models/user.model")
 
 // Connect to the database
 mongoose.connect(config.db.uri, {
@@ -25,6 +28,10 @@ db.once("open", () => {
 
 app.use("/media", express.static(path.join(__dirname, "media")))
 app.use(bodyParser.json())
+app.use(passport.initialize())
+passport.use(new LocalStrategy({ usernameField: "email" }, User.authenticate()))
+passport.serializeUser(User.serializeUser())
+passport.deserializeUser(User.deserializeUser())
 app.use(routes)
 
 // Error handler
@@ -33,7 +40,7 @@ app.use((err, req, res, next) => {
     return res.status(500).json({
       message: "Unexpected error",
     })
-  } else return res.send(err)
+  } else return res.status(500).send(err)
 })
 
 app.listen(config.port, () => {
