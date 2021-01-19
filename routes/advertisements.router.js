@@ -27,4 +27,19 @@ router.get(
   }
 )
 
+router.get("/:id", [param("id").isMongoId()], (req, res, next) => {
+  const errors = validationResult(req).formatWith(errorFormatter)
+  if (!errors.isEmpty())
+    return res.status(404).json({ message: "Invalid advertisement id" })
+
+  Advertisement.findById(req.params.id)
+    .populate("category tags advertiser")
+    .exec((err, data) => {
+      if (err) return next(err)
+      if (!data)
+        return res.status(404).json({ message: "Advertisement not found" })
+      return res.json({ data })
+    })
+})
+
 module.exports = router
