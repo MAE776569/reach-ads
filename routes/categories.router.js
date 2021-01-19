@@ -24,4 +24,23 @@ router.get("/:id", [param("id").isMongoId()], (req, res, next) => {
   })
 })
 
+router.post(
+  "/",
+  [
+    body("title").isString().notEmpty(),
+    body("description").isString().notEmpty().optional(),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req).formatWith(errorFormatter)
+    if (!errors.isEmpty())
+      return res.status(422).json({ errors: errors.mapped() })
+
+    const { title, ...optionalData } = req.body
+    Category.create({ title, ...optionalData }, (err, data) => {
+      if (err) return next(err)
+      return res.status(201).json({ data })
+    })
+  }
+)
+
 module.exports = router
