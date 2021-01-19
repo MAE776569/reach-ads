@@ -42,4 +42,50 @@ router.get("/:id", [param("id").isMongoId()], (req, res, next) => {
     })
 })
 
+router.post(
+  "/",
+  [
+    body("type").isIn(["free", "paid"]),
+    body("title").isString().notEmpty(),
+    body("category").isMongoId(),
+    body("advertiser").isMongoId(),
+    body("tags").isArray(),
+    body("tags.*").isMongoId(),
+    body("endDate").isDate(),
+    body("startDate").isDate().optional(),
+    body("description").isString().notEmpty().optional(),
+    body("image").isURL().optional(),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req).formatWith(errorFormatter)
+    if (!errors.isEmpty())
+      return res.status(422).json({ errors: errors.mapped() })
+
+    const {
+      type,
+      title,
+      category,
+      advertiser,
+      tags,
+      endDate,
+      ...optionalData
+    } = req.body
+    Advertisement.create(
+      {
+        type,
+        title,
+        category,
+        advertiser,
+        tags,
+        endDate,
+        ...optionalData,
+      },
+      (err, data) => {
+        if (err) return next(err)
+        return res.status(201).json({ data })
+      }
+    )
+  }
+)
+
 module.exports = router
