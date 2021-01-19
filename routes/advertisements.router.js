@@ -88,4 +88,57 @@ router.post(
   }
 )
 
+router.put(
+  "/:id",
+  [
+    param("id").isMongoId(),
+    body("type").isIn(["free", "paid"]),
+    body("title").isString().notEmpty(),
+    body("category").isMongoId(),
+    body("advertiser").isMongoId(),
+    body("tags").isArray(),
+    body("tags.*").isMongoId(),
+    body("endDate").isDate(),
+    body("startDate").isDate().optional(),
+    body("description").isString().notEmpty().optional(),
+    body("image").isString().notEmpty().optional(),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req).formatWith(errorFormatter)
+    const mappedErrors = errors.mapped()
+    if (mappedErrors.id)
+      return res.status(404).json({ message: "Invalid advertisement id" })
+    if (!errors.isEmpty()) return res.status(422).json({ errors: mappedErrors })
+
+    const {
+      type,
+      title,
+      category,
+      advertiser,
+      tags,
+      endDate,
+      ...optionalData
+    } = req.body
+    Advertisement.findByIdAndUpdate(
+      req.params.id,
+      {
+        type,
+        title,
+        category,
+        advertiser,
+        tags,
+        endDate,
+        ...optionalData,
+      },
+      { new: true },
+      (err, data) => {
+        if (err) return next(err)
+        if (!data)
+          return res.status(404).json({ message: "Advertisement not found" })
+        return res.json({ data })
+      }
+    )
+  }
+)
+
 module.exports = router
