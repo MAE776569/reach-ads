@@ -43,4 +43,33 @@ router.post(
   }
 )
 
+router.put(
+  "/:id",
+  [
+    param("id").isMongoId(),
+    body("title").isString().notEmpty(),
+    body("description").isString().notEmpty().optional(),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req).formatWith(errorFormatter)
+    const mappedErrors = errors.mapped()
+    if (mappedErrors.id)
+      return res.status(422).json({ message: "Invalid category id" })
+    if (!errors.isEmpty()) return res.status(422).json({ errors: mappedErrors })
+
+    const { title, ...optionalData } = req.body
+    Category.findByIdAndUpdate(
+      req.params.id,
+      { title, ...optionalData },
+      { new: true },
+      (err, data) => {
+        if (err) return next(err)
+        if (!data)
+          return res.status(404).json({ message: "Category not found" })
+        return res.json({ data })
+      }
+    )
+  }
+)
+
 module.exports = router
