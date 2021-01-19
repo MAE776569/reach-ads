@@ -12,4 +12,16 @@ router.get("/", (req, res, next) => {
     })
 })
 
+router.get("/:id", [param("id").isMongoId()], (req, res, next) => {
+  const errors = validationResult(req).formatWith(errorFormatter)
+  if (!errors.isEmpty())
+    return res.status(404).json({ message: "Category not found" })
+
+  Category.findById(req.params.id, (err, data) => {
+    if (err) return next(err)
+    if (!data) res.status(404).json({ message: "Category not found" })
+    return res.json({ data })
+  })
+})
+
 module.exports = router
