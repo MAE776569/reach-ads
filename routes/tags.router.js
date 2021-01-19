@@ -8,15 +8,18 @@ router.get("/", [query("name").isAlpha().optional()], (req, res, next) => {
   const { name } = req.query
   const filter = errors.name || !name ? {} : { name: new RegExp(name, "ig") }
 
-  Tag.find(filter).exec((err, data) => {
-    if (err) return next(err)
-    return res.json({ data })
-  })
+  Tag.find(filter)
+    .sort("name")
+    .exec((err, data) => {
+      if (err) return next(err)
+      return res.json({ data })
+    })
 })
 
 router.get("/:id", [param("id").isMongoId()], (req, res, next) => {
-  const errors = validationResult(req).formatWith(errorFormatter).mapped()
-  if (errors.id) return res.status(404).json({ message: "Invalid tag id" })
+  const errors = validationResult(req).formatWith(errorFormatter)
+  if (!errors.isEmpty())
+    return res.status(404).json({ message: "Invalid tag id" })
 
   Tag.findById(req.params.id, (err, data) => {
     if (err) return next(err)
@@ -55,10 +58,10 @@ router.put(
   ],
   (req, res, next) => {
     const errors = validationResult(req).formatWith(errorFormatter)
-    const errorsMapped = errors.mapped()
-    if (errorsMapped.id)
+    const mappedErrors = errors.mapped()
+    if (mappedErrors.id)
       return res.status(404).json({ message: "Invalid tag id" })
-    if (!errors.isEmpty()) return res.status(422).json({ errors: errorsMapped })
+    if (!errors.isEmpty()) return res.status(422).json({ errors: mappedErrors })
 
     const { name } = req.body
     Tag.findOne({ name }, (err, data) => {
@@ -81,8 +84,9 @@ router.put(
 )
 
 router.delete("/:id", [param("id").isMongoId()], (req, res, next) => {
-  const errors = validationResult(req).formatWith(errorFormatter).mapped()
-  if (errors.id) return res.status(404).json({ message: "Invalid tag id" })
+  const errors = validationResult(req).formatWith(errorFormatter)
+  if (!errors.isEmpty())
+    return res.status(404).json({ message: "Invalid tag id" })
 
   Tag.findByIdAndDelete(req.params.id, (err, data) => {
     if (err) return next(err)
