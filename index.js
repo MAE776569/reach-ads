@@ -10,6 +10,7 @@ const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy
 const User = require("./models/user.model")
 const cookieParser = require("cookie-parser")
+const adReminderJob = require("./workers/ad-reminder-worker")
 
 // Connect to the database
 mongoose.connect(config.db.uri, {
@@ -21,10 +22,12 @@ mongoose.connect(config.db.uri, {
 const db = mongoose.connection
 db.on("error", () => {
   console.error.bind(console, "! Error connecting to the database")
+  adReminderJob.stop()
   process.exit(1)
 })
 db.once("open", () => {
   console.log("> Connected correctly to the database")
+  adReminderJob.start()
 })
 
 app.use("/media", express.static(path.join(__dirname, "media")))
