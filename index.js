@@ -11,6 +11,8 @@ const LocalStrategy = require("passport-local").Strategy
 const User = require("./models/user.model")
 const cookieParser = require("cookie-parser")
 const adReminderJob = require("./workers/ad-reminder-worker")
+const helmet = require("helmet")
+const cors = require("cors")
 
 // Connect to the database
 mongoose.connect(config.db.uri, {
@@ -29,6 +31,13 @@ db.once("open", () => {
   console.log("> Connected correctly to the database")
   adReminderJob.start()
 })
+
+app.use(helmet())
+app.use(
+  cors({
+    origin: ["http://localhost:3000"],
+  })
+)
 
 app.use("/media", express.static(path.join(__dirname, "media")))
 app.use(bodyParser.json())
