@@ -13,4 +13,8 @@ module.exports = {
     // max age in seconds
     maxAge: process.env.COOKIES_MAX_AGE,
   },
+  email: {
+    user: process.env.EMAIL_USER,
+    password: process.env.EMAIL_PASSWORD,
+  },
 }
