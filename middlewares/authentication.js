@@ -21,6 +21,15 @@ function authenticateUser(req, res, next) {
   })
 }
 
+const authenticateAdmin = [
+  authenticateUser,
+  (req, res, next) =>
+    req.user.isAdmin
+      ? next()
+      : res.status(401).json({ message: "Unauthorized" }),
+]
+
 module.exports = {
   authenticateUser,
+  authenticateAdmin
 }
