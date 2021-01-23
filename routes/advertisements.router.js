@@ -53,7 +53,7 @@ router.post(
     body("tags.*").isMongoId(),
     body("endDate").isDate(),
     body("startDate").isDate().optional(),
-    body("description").isString().notEmpty().optional(),
+    body("description").isString().optional(),
     body("image").isURL().optional(),
   ],
   (req, res, next) => {
@@ -100,8 +100,8 @@ router.put(
     body("tags.*").isMongoId(),
     body("endDate").isDate(),
     body("startDate").isDate().optional(),
-    body("description").isString().notEmpty().optional(),
-    body("image").isString().notEmpty().optional(),
+    body("description").isString().optional(),
+    body("image").isString().optional(),
   ],
   (req, res, next) => {
     const errors = validationResult(req).formatWith(errorFormatter)

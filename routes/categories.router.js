@@ -28,7 +28,7 @@ router.post(
   "/",
   [
     body("title").isString().notEmpty(),
-    body("description").isString().notEmpty().optional(),
+    body("description").isString().optional(),
   ],
   (req, res, next) => {
     const errors = validationResult(req).formatWith(errorFormatter)
@@ -48,7 +48,7 @@ router.put(
   [
     param("id").isMongoId(),
     body("title").isString().notEmpty(),
-    body("description").isString().notEmpty().optional(),
+    body("description").isString().optional(),
   ],
   (req, res, next) => {
     const errors = validationResult(req).formatWith(errorFormatter)
