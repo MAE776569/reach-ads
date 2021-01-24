@@ -51,7 +51,7 @@ app.use(passport.initialize())
 passport.use(new LocalStrategy({ usernameField: "email" }, User.authenticate()))
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
-app.use(routes)
+app.use("/v1", routes)
 
 // Error handler
 app.use((err, req, res, next) => {
