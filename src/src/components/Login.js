@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Flex,
   Box,
@@ -13,7 +13,7 @@ import {
   Icon,
   Container,
 } from "@chakra-ui/react"
-import { login } from "../utils/api"
+import { login, getUser } from "../utils/api"
 import ErrorMessage from "../components/ErrorMessage"
 import { useHistory } from "react-router-dom"
 
@@ -24,6 +24,14 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const history = useHistory()
+
+  useEffect(() => {
+    getUser()
+      .then((res) => {
+        if (res.status === 200) history.push("/")
+      })
+      .catch(() => {})
+  }, [])
 
   const handleSubmit = async (event) => {
     event.preventDefault()

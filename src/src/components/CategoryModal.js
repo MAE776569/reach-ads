@@ -14,6 +14,7 @@ import {
   Textarea,
 } from "@chakra-ui/react"
 import { createCategory } from "../utils/api"
+import { useHistory } from "react-router-dom"
 
 function CategoryModal({
   isOpen,
@@ -24,6 +25,7 @@ function CategoryModal({
 }) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
+  const history = useHistory()
 
   const handleSubmit = async () => {
     try {
@@ -36,7 +38,11 @@ function CategoryModal({
         onClose()
       }
     } catch (error) {
-      console.log(error)
+      if (error.response) {
+        if (error.response.status === 401 || error.response.status === 403) {
+          history.push("/login")
+        }
+      }
     }
   }
 

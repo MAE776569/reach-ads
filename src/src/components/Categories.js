@@ -21,6 +21,7 @@ import { EditIcon, DeleteIcon } from "@chakra-ui/icons"
 import { deleteCategory, editCategory, getCategories } from "../utils/api"
 import CategoryModal from "./CategoryModal"
 import CategoryAlert from "./CategoryAlert"
+import { useHistory } from "react-router-dom"
 
 const Categories = () => {
   const [categories, setCategories] = useState([])
@@ -33,13 +34,18 @@ const Categories = () => {
   const [openAlert, setOpenAlert] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [categoryToEdit, setEditCategory] = useState(null)
+  const history = useHistory()
 
   const fetchCategories = async () => {
     try {
       const res = await getCategories()
       setCategories(res.data.data)
     } catch (error) {
-      console.log(error)
+      if (error.response) {
+        if (error.response.status === 401 || error.response.status === 403) {
+          history.push("/login")
+        }
+      }
     }
   }
 
@@ -57,7 +63,11 @@ const Categories = () => {
     try {
       await deleteCategory(deleteId)
     } catch (error) {
-      console.log(error)
+      if (error.response) {
+        if (error.response.status === 401 || error.response.status === 403) {
+          history.push("/login")
+        }
+      }
     }
   }
 
@@ -66,6 +76,11 @@ const Categories = () => {
       const res = await editCategory(editId, category)
       return res
     } catch (error) {
+      if (error.response) {
+        if (error.response.status === 401 || error.response.status === 403) {
+          history.push("/login")
+        }
+      }
       return (error.response && error.response.status) || 500
     }
   }

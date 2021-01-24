@@ -1,19 +1,21 @@
 import React, { useEffect } from "react"
-import { Route, Redirect } from "react-router-dom"
+import { Route, useHistory } from "react-router-dom"
 import Categories from "./Categories"
 import Login from "./Login"
 import api from "../utils/api"
 import { useToast } from "@chakra-ui/react"
 
 function App() {
+  const history = useHistory()
   const toast = useToast()
+
   useEffect(() => {
     const interceptor = api.interceptors.response.use(
       (res) => Promise.resolve(res),
       (error) => {
         if (error.response) {
           if (error.response.status === 401 || error.response.status === 403) {
-            return <Redirect to="login" />
+            history.push("/login")
           } else if (error.response.status === 422) {
             const firstError = Object.keys(error.response.data.errors)[0]
             const firstErrorMessage = error.response.data.errors[firstError]
