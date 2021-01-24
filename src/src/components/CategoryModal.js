@@ -27,11 +27,14 @@ function CategoryModal({
 
   const handleSubmit = async () => {
     try {
-      if (isEdit) handleUpdateCategory({ title, description })
-      else await createCategory({ title, description })
-      setTitle("")
-      setDescription("")
-      onClose()
+      let res
+      if (isEdit) res = await handleUpdateCategory({ title, description })
+      else res = await createCategory({ title, description })
+      if (res.status === 200 || res.status === 201) {
+        setTitle("")
+        setDescription("")
+        onClose()
+      }
     } catch (error) {
       console.log(error)
     }

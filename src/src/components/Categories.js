@@ -63,9 +63,10 @@ const Categories = () => {
 
   const handleUpdateCategory = async (category) => {
     try {
-      await editCategory(editId, category)
+      const res = await editCategory(editId, category)
+      return res
     } catch (error) {
-      console.log(error)
+      return (error.response && error.response.status) || 500
     }
   }
 
