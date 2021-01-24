@@ -1,5 +1,8 @@
 const router = require("express").Router()
 const saveImage = require("../middlewares/imageUploader")
+const { authenticateUser } = require("../middlewares/authentication")
+
+router.use(authenticateUser)
 
 router.post("/", saveImage, (req, res) => {
   const { file } = req

@@ -2,6 +2,9 @@ const router = require("express").Router()
 const Category = require("../models/category.model")
 const { body, param, query, validationResult } = require("express-validator")
 const errorFormatter = require("../config/errorFormatter")
+const { authenticateUser } = require("../middlewares/authentication")
+
+router.use(authenticateUser)
 
 router.get("/", (req, res, next) => {
   Category.find({})

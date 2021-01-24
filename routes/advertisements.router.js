@@ -2,6 +2,9 @@ const router = require("express").Router()
 const Advertisement = require("../models/advertisement.model")
 const { body, param, query, validationResult } = require("express-validator")
 const errorFormatter = require("../config/errorFormatter")
+const { authenticateUser } = require("../middlewares/authentication")
+
+router.use(authenticateUser)
 
 router.get(
   "/",
