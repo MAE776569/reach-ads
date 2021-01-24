@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const api = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "http://localhost:5000/v1",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -9,8 +9,10 @@ const api = axios.create({
 })
 
 export const getCategories = () => api.get("/categories")
-export const login = (body) => api.post("/auth/login", body)
+export const login = (body) => api.post("/auth/admin/login", body)
 export const createCategory = (category) => api.post("/categories", category)
 export const editCategory = (id, category) =>
   api.put(`/categories/${id}`, category)
 export const deleteCategory = (id) => api.delete(`/categories/${id}`)
+
+export default api
